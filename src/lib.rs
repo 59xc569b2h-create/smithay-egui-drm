@@ -3,7 +3,7 @@ use egui::{Context, Event, FullOutput, Pos2, RawInput, Rect, Vec2};
 use egui::{PlatformOutput, ViewportId, ViewportInfo};
 use egui_glow::Painter;
 #[cfg(feature = "desktop_integration")]
-use smithay::desktop::space::SpaceElement;
+use smithay::desktop::space::{RenderZindex, SpaceElement};
 use smithay::{
     backend::{
         allocator::Fourcc,
@@ -18,7 +18,6 @@ use smithay::{
             Bind, Frame, Offscreen, Renderer,
         },
     },
-    desktop::space::RenderZindex,
     input::{
         keyboard::{KeyboardTarget, KeysymHandle, ModifiersState},
         pointer::{
