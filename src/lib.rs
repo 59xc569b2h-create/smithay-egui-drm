@@ -1,24 +1,24 @@
-use anyhow::Result;
+pub mod drm_backend;
+pub mod touch_input;
+
+pub use drm_backend::DrmDevice;
+pub use touch_input::{TouchInput, TouchEvent, TouchType};
+
 use egui::{Context, FullOutput, RawInput};
 use std::time::Instant;
 
-pub struct BareMetalEgui {
+/// Основная структура для интеграции egui с bare-metal
+pub struct EguiManager {
     ctx: Context,
     start_time: Instant,
-    touch_x: f32,
-    touch_y: f32,
-    touch_pressed: bool,
 }
 
-impl BareMetalEgui {
+impl EguiManager {
     pub fn new() -> Self {
         let ctx = Context::default();
         Self {
             ctx,
             start_time: Instant::now(),
-            touch_x: 0.0,
-            touch_y: 0.0,
-            touch_pressed: false,
         }
     }
 
@@ -26,34 +26,33 @@ impl BareMetalEgui {
         &self.ctx
     }
 
-    pub fn handle_touch_event(&mut self, x: f32, y: f32, pressed: bool) {
-        self.touch_x = x;
-        self.touch_y = y;
-        self.touch_pressed = pressed;
-    }
-
-    pub fn run_ui<F>(&mut self, ui_callback: F) -> FullOutput 
+    /// Запуск рендеринга UI
+    pub fn run<F>(&self, ui_callback: F, width: u32, height: u32, touch_events: &[TouchEvent]) -> FullOutput 
     where
         F: FnOnce(&Context),
     {
-        let raw_input = RawInput {
+        let raw_input = self.build_raw_input(width, height, touch_events);
+        self.ctx.run(raw_input, ui_callback)
+    }
+
+    fn build_raw_input(&self, width: u32, height: u32, touch_events: &[TouchEvent]) -> RawInput {
+        // Преобразование touch events в egui input
+        let pointers = touch_events.iter()
+            .map(|event| egui::PointerState {
+                pos: egui::Pos2::new(event.x, event.y),
+                pressed: matches!(event.touch_type, TouchType::Press | TouchType::Move),
+                ..Default::default()
+            })
+            .collect();
+
+        RawInput {
             screen_rect: Some(egui::Rect::from_min_size(
                 egui::Pos2::ZERO,
-                egui::Vec2::new(1280.0, 720.0), // Your screen size
+                egui::Vec2::new(width as f32, height as f32),
             )),
             time: Some(self.start_time.elapsed().as_secs_f64()),
-            pointers: if self.touch_pressed {
-                vec![egui::PointerState {
-                    pos: egui::Pos2::new(self.touch_x, self.touch_y),
-                    pressed: self.touch_pressed,
-                    ..Default::default()
-                }]
-            } else {
-                vec![]
-            },
+            pointers,
             ..Default::default()
-        };
-
-        self.ctx.run(raw_input, ui_callback)
+        }
     }
 }
