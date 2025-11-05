@@ -39,7 +39,7 @@ impl BareMetalEgui {
         let raw_input = RawInput {
             screen_rect: Some(egui::Rect::from_min_size(
                 egui::Pos2::ZERO,
-                egui::Vec2::new(1920.0, 1080.0), // Your screen size
+                egui::Vec2::new(1280.0, 720.0), // Your screen size
             )),
             time: Some(self.start_time.elapsed().as_secs_f64()),
             pointers: if self.touch_pressed {
