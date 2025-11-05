@@ -18,7 +18,7 @@ gbm = "0.14"
 egl = "0.5"
 glow = "0.13"
 
-# Input handling (минимальный набор)
+# Input handling
 libc = "0.2"
 nix = "0.27"
 
@@ -30,7 +30,7 @@ img = { version = "0.25", optional = true, default-features = false }
 udev = "0.9"
 
 [features]
-default = ["default_fonts", "svg", "png", "jpg"]
+default = ["default_fonts", "png", "svg"]
 default_fonts = ["egui/default_fonts"]
 
 # Image support features
