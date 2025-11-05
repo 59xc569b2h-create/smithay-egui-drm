@@ -10,6 +10,8 @@ egui = "0.24"
 egui_glow = "0.24"
 log = "0.4"
 anyhow = "1.0"
+egui_extras = { version = "0.24", optional = true }
+img = { version = "0.25", optional = true, default-features = false }
 
 # DRM/KMS dependencies
 drm = "0.11"
@@ -29,5 +31,9 @@ tslib = "0.1"
 udev = "0.9"
 
 [features]
-default = ["default_fonts"]
+default = ["default_fonts", "png", "svg"]
 default_fonts = ["egui/default_fonts"]
+image = ["egui_extras", "img"]
+svg = ["image", "egui_extras/svg"]
+png = ["image", "egui_extras/image", "img/png"]
+jpg = ["image", "egui_extras/image", "img/jpeg"]
